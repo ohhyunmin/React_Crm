@@ -1,16 +1,19 @@
-
+import  React, { Component } from 'react';
+import Customer from './Component/Customer';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-      </header>
-    </div>
-  );
+const customer={
+  'name':'홍길동',
+  'birthday':'941122',
+  'gender':'남자',
+  'job':'대학생'
+}
+class App extends Component{
+  render (){
+    return (
+      <Customer name={customer.name} birthday={customer.birthday} gender={customer.gender} job={customer.job}></Customer>
+    );
+  }
 }
 
 export default App;
