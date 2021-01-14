@@ -20,31 +20,24 @@ const styles = theme => ({
   }
 })
 
-const customers=[{
-  'id': 1,
-  'image': 'https://placeimg.com/64/64/1',
-  'name':'홍길동',
-  'birthday':'941122',
-  'gender':'남자',
-  'job':'대학생'
-},
-{
-  'id': 2,
-  'image': 'https://placeimg.com/64/64/2',
-  'name':'김다미',
-  'birthday':'990101',
-  'gender':'남자',
-  'job':'프로그래머'
-},
-{
-  'id': 3,
-  'image': 'https://placeimg.com/64/64/3',
-  'name':'도동동',
-  'birthday':'970203',
-  'gender':'여자',
-  'job':'대학생'
-}]
 class App extends Component{
+  state = {
+    customers: ""
+  }
+
+  componentDidMount(){
+    //모든 컴포넌트가 모두 읽어진 후 API 등의 데이터를 가져오는 과정을 구현
+    this.callApi()
+    .then(res => this.setState({customers: res}))
+    .catch(err => console.log(err));
+  }
+
+  callApi = async () => {
+    const response = await fetch('/api/customers');
+    const body = await response.json();
+    return body;
+  }
+
   render (){
     const {classes} = this.props;
     return (
@@ -62,7 +55,9 @@ class App extends Component{
           </TableHead>
           <TableBody>
             {
-              customers.map(c=>{
+              //처음 실행 시 customers 데이터가 없을 수 있어 방지하고자함
+              this.state.customers ? 
+              this.state.customers.map(c=>{
               return(
                 <Customer 
                   key={c.id}
@@ -74,7 +69,7 @@ class App extends Component{
                   job={c.job}
                 />
                 )
-              })
+              }):""
             }
           </TableBody>
         </Table>
