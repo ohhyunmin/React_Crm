@@ -8,6 +8,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import {withStyles} from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
   root:{
@@ -17,25 +18,45 @@ const styles = theme => ({
   },
   table:{
     minWidth: 1080
+  },
+  progress: {
+    margin: theme.spacing.unit * 2
   }
 })
 
+/*
+  리액트 생성주기
+  1) constructor()
+  2) componentwillMount()
+  3) render()
+  4) componentDidMount()
+
+  porps or state 변경 시 shouldComponentUpdate() 등 실행 후 render 를 다시 해줌
+*/
+
 class App extends Component{
   state = {
-    customers: ""
+    customers: "",
+    completed: 0 //프로그레스 0%
   }
 
   componentDidMount(){
+    this.timer = setInterval(this.progress, 20);
     //모든 컴포넌트가 모두 읽어진 후 API 등의 데이터를 가져오는 과정을 구현
-    this.callApi()
-    .then(res => this.setState({customers: res}))
-    .catch(err => console.log(err));
+     this.callApi()
+     .then(res => this.setState({customers: res}))
+     .catch(err => console.log(err));
   }
 
   callApi = async () => {
     const response = await fetch('/api/customers');
     const body = await response.json();
     return body;
+  }
+
+  progress = () => {
+    const {completed} = this.state;
+    this.setState({completed: completed>=100 ? 0 : completed+1})
   }
 
   render (){
@@ -69,7 +90,12 @@ class App extends Component{
                   job={c.job}
                 />
                 )
-              }):""
+              }):
+              <TableRow>
+                <TableCell colSpan="6" align="center">
+                  <CircularProgress className={classes.progress} variant="determinate" value={this.state.completed}></CircularProgress>
+                </TableCell>
+              </TableRow>
             }
           </TableBody>
         </Table>
