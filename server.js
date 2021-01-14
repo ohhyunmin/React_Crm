@@ -1,36 +1,32 @@
+const filestream = require('fs'); //database.json 파일을 읽기위해
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+
+
 const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+const data = filestream.readFileSync('./database.json');
+const conf = JSON.parse(data);
+const mysql = require('mysql'); //mysql라이브러리를 가져와서 mysql변수에 넣음
+
+const connection = mysql.createConnection({
+    host: conf.host,
+    user: conf.user,
+    password: conf.password,
+    port: conf.port,
+    database: conf.database
+});
+connection.connect();
+
 app.get('/api/customers', (req,res)=>{
-    res.send([{
-        'id': 1,
-        'image': 'https://placeimg.com/64/64/1',
-        'name':'홍길동',
-        'birthday':'941122',
-        'gender':'남자',
-        'job':'대학생'
-      },
-      {
-        'id': 2,
-        'image': 'https://placeimg.com/64/64/2',
-        'name':'김다미',
-        'birthday':'990101',
-        'gender':'남자',
-        'job':'프로그래머'
-      },
-      {
-        'id': 3,
-        'image': 'https://placeimg.com/64/64/3',
-        'name':'도동동',
-        'birthday':'970203',
-        'gender':'여자',
-        'job':'대학생'
-      }]);
+    connection.query("SELECT * FROM CUSTOMER",
+    (err, rows, fields) => {
+        res.send(rows);
+    });
 });
 
 app.listen(port, ()=> console.log("nodejs 실행됨"));
