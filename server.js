@@ -22,11 +22,31 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
+const multer = require('multer');
+const upload = multer({dest: './upload'})
+
 app.get('/api/customers', (req,res)=>{
     connection.query("SELECT * FROM CUSTOMER",
     (err, rows, fields) => {
         res.send(rows);
     });
+});
+
+app.use('/image', express.static('./upload')); //image 라는 경로로 접근을 하지만 실제로 upload로 이동
+
+app.post('/api/customers', upload.single('IMAGE'), (req,res)=>{
+    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?,?,?,?,?)';
+    let image = '/image/' + req.file.filename;
+    console.log(req.body.NAME);
+    let name = req.body.NAME;
+    let birthday = req.body.BIRTHDAY;
+    let gender = req.body.GENDER;
+    let job = req.body.JOB;
+    let params = [image, name, birthday, gender, job];
+    connection.query(sql, params,
+        (err, rows, fields)=>{
+            res.send(rows);
+        })
 });
 
 app.listen(port, ()=> console.log("nodejs 실행됨"));
